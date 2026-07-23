@@ -51,22 +51,34 @@ def _decode(raw: dict, pool: PoolConfig, chain: ChainConfig) -> dict | None:
     }
     if pool.protocol == "uniswap_v2":
         row = v2_swap.decode_swap(raw, **kwargs)
-    elif pool.protocol == "uniswap_v3":
+    elif _is_v3_compatible(pool.protocol):
         row = v3_swap.decode_swap(raw, **kwargs)
     else:
         raise ValueError(f"Unsupported protocol: {pool.protocol}")
     if row is None:
         return None
+    # Keep config protocol label (camelot_v3 / aerodrome_slipstream / …), not the decoder default.
+    row["protocol"] = pool.protocol
     row["quote_token"] = pool.quote_token
     row["quote_is_stable"] = pool.quote_is_stable
     row["fee_tier"] = pool.fee_tier
     return row
 
 
+def _is_v3_compatible(protocol: str) -> bool:
+    """Uniswap V3 Swap ABI (same topic0) — Algebra / Slipstream forks included."""
+    return protocol in {
+        "uniswap_v3",
+        "camelot_v3",
+        "aerodrome_slipstream",
+        "pharaoh_v3",
+    }
+
+
 def _topic0(protocol: str) -> str:
     if protocol == "uniswap_v2":
         return v2_swap.topic0()
-    if protocol == "uniswap_v3":
+    if _is_v3_compatible(protocol):
         return v3_swap.topic0()
     raise ValueError(f"Unsupported protocol: {protocol}")
 

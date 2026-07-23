@@ -10,7 +10,12 @@ models:
         tests:
           - accepted_values:
               arguments:
-                values: ["uniswap_v2", "uniswap_v3"]
+                values:
+                  - uniswap_v2
+                  - uniswap_v3
+                  - camelot_v3
+                  - aerodrome_slipstream
+                  - pharaoh_v3
       - name: tx_hash
         tests: [not_null]
       - name: log_index

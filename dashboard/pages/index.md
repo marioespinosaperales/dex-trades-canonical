@@ -2,8 +2,8 @@
 title: Canonical dex.trades
 ---
 
-Uniswap V2/V3 Swap logs on **Ethereum, Base, Arbitrum, Avalanche** → semantic `dex.trades`
-with dust and same-tx self-churn flags.
+Uniswap + native DEX Swap logs on **Ethereum, Base, Arbitrum, Avalanche**
+(Camelot / Aerodrome / Pharaoh) → semantic `dex.trades` with dust and same-tx self-churn flags.
 
 Noise rows are **flagged, not deleted**. Filter on `is_clean` for volume.
 

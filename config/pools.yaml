@@ -74,3 +74,49 @@ pools:
     token1_address: "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6e"
     quote_is_stable: true
     quote_token: token1
+
+  # Native DEXes (Uniswap V3–compatible Swap topic0)
+  - name: arb_camelot_v3_weth_usdc
+    chain: arbitrum
+    protocol: camelot_v3
+    address: "0xb1026b8e7276e7ac75410f1fcbbe21796e8f7526"
+    enabled: true
+    fee_tier: null
+    token0_symbol: WETH
+    token1_symbol: USDC
+    token0_decimals: 18
+    token1_decimals: 6
+    token0_address: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+    token1_address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+    quote_is_stable: true
+    quote_token: token1
+
+  - name: base_aerodrome_slipstream_weth_usdc
+    chain: base
+    protocol: aerodrome_slipstream
+    address: "0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59"
+    enabled: true
+    fee_tier: null
+    token0_symbol: WETH
+    token1_symbol: USDC
+    token0_decimals: 18
+    token1_decimals: 6
+    token0_address: "0x4200000000000000000000000000000000000006"
+    token1_address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    quote_is_stable: true
+    quote_token: token1
+
+  - name: avax_pharaoh_v3_wavax_usdc
+    chain: avalanche
+    protocol: pharaoh_v3
+    address: "0xf01449C0bA930B6e2CaCA3DEF3CCBd7a3E589534"
+    enabled: true
+    fee_tier: 900
+    token0_symbol: WAVAX
+    token1_symbol: USDC
+    token0_decimals: 18
+    token1_decimals: 6
+    token0_address: "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7"
+    token1_address: "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6e"
+    quote_is_stable: true
+    quote_token: token1

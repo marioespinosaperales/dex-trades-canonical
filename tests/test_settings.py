@@ -11,5 +11,13 @@ def test_settings_load():
     assert len(settings.chains) >= 4
     assert {c.name for c in settings.chains} >= {"ethereum", "base", "arbitrum", "avalanche"}
     enabled = [p for p in settings.pools if p.enabled]
-    assert len(enabled) >= 5
+    assert len(enabled) >= 8
+    protocols = {p.protocol for p in enabled}
+    assert protocols >= {
+        "uniswap_v2",
+        "uniswap_v3",
+        "camelot_v3",
+        "aerodrome_slipstream",
+        "pharaoh_v3",
+    }
     assert settings.pipeline.chunk_size == 10

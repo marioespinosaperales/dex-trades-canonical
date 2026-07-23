@@ -29,7 +29,7 @@ flowchart LR
 ## Scope (v1)
 
 - Chains: Ethereum + Base + Arbitrum + Avalanche (Alchemy HTTPS)
-- Protocols: Uniswap V2 + Uniswap V3
+- Protocols: Uniswap V2/V3 + native DEXes (Camelot, Aerodrome Slipstream, Pharaoh)
 - Output: `int_dex_trades` / `mart_dex_trades` + `mart_dex_volume_by_protocol`
 - Out of v1: Solana, Curve, lending.liquidations, full factory discovery
 
@@ -83,8 +83,11 @@ Alchemy Free: `chunk_size: 10` (same `eth_getLogs` cap as sibling LP repo).
 | Ethereum | V3 0.05% | USDC/WETH | `0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640` |
 | Ethereum | V2 | USDC/WETH | `0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc` |
 | Base | V3 0.05% | WETH/USDC | `0xd0b53D9277642d899DF5C87A3966A349A798F224` |
-| Arbitrum | V3 0.05% | WETH/USDC | `0xC6962004f452be9203591991d15f6b388e09E8D0` |
-| Avalanche | V3 0.05% | WAVAX/USDC | `0xfAe3f424a0a47706811521E3ee268f00cFb5c45E` |
+| Arbitrum | Uniswap V3 0.05% | WETH/USDC | `0xC6962004f452be9203591991d15f6b388e09E8D0` |
+| Arbitrum | Camelot V3 | WETH/USDC | `0xb1026b8e7276e7ac75410f1fcbbe21796e8f7526` |
+| Avalanche | Uniswap V3 0.05% | WAVAX/USDC | `0xfAe3f424a0a47706811521E3ee268f00cFb5c45E` |
+| Avalanche | Pharaoh V3 | WAVAX/USDC | `0xf01449C0bA930B6e2CaCA3DEF3CCBd7a3E589534` |
+| Base | Aerodrome Slipstream | WETH/USDC | `0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59` |
 
 ## Repository layout
 
