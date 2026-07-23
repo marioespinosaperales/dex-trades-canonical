@@ -1,0 +1,4 @@
+name: dex
+type: duckdb
+options:
+  filename: dex_marts.duckdb

@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_raw_swaps
+    columns:
+      - name: chain
+        tests: [not_null]
+      - name: tx_hash
+        tests: [not_null]
+      - name: log_index
+        tests: [not_null]
+      - name: protocol
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["uniswap_v2", "uniswap_v3"]

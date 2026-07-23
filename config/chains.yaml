@@ -1,0 +1,9 @@
+chains:
+  - name: ethereum
+    chain_id: 1
+    rpc_env: DEX_ETH_RPC_URL
+    confirmations: 12
+  - name: base
+    chain_id: 8453
+    rpc_env: DEX_BASE_RPC_URL
+    confirmations: 12

@@ -1,0 +1,7 @@
+dex_trades:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('DEX_DUCKDB_PATH', 'warehouse/dex.duckdb') }}"
+      threads: 4

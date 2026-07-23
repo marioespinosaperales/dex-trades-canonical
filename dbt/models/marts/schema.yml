@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: mart_dex_trades
+    columns:
+      - name: chain
+        tests: [not_null]
+      - name: is_clean
+        tests: [not_null]
+
+  - name: mart_dex_volume_by_protocol
+    columns:
+      - name: trade_count
+        tests: [not_null]

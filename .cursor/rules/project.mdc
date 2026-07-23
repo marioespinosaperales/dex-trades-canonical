@@ -1,0 +1,11 @@
+---
+description: dex-trades-canonical conventions
+globs:
+alwaysApply: true
+---
+
+- Secrets only via `DEX_` env vars (`DEX_ETH_RPC_URL`, `DEX_BASE_RPC_URL`). Never put keys in YAML.
+- Alchemy Free: `chunk_size: 10` for eth_getLogs.
+- Canonical trade grain and noise flags (`is_dust`, `is_self_churn`, `is_clean`) live in dbt `int_dex_trades`.
+- English only in committed text.
+- Do not commit `data/`, `warehouse/`, or `.env`.

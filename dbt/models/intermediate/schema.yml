@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: int_dex_trades
+    description: Canonical dex.trades — one row per Swap log with noise flags.
+    columns:
+      - name: chain
+        tests: [not_null]
+      - name: protocol
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["uniswap_v2", "uniswap_v3"]
+      - name: tx_hash
+        tests: [not_null]
+      - name: log_index
+        tests: [not_null]
+      - name: is_clean
+        tests: [not_null]
