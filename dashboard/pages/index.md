@@ -2,7 +2,8 @@
 title: Canonical dex.trades
 ---
 
-Uniswap V2/V3 Swap logs on **Ethereum + Base** → semantic `dex.trades` with dust and same-tx self-churn flags.
+Uniswap V2/V3 Swap logs on **Ethereum, Base, Arbitrum, Avalanche** → semantic `dex.trades`
+with dust and same-tx self-churn flags.
 
 Noise rows are **flagged, not deleted**. Filter on `is_clean` for volume.
 
@@ -39,7 +40,7 @@ select * from dex.noise_summary order by chain, protocol
 ## dex.trades
 
 Same grain as Allium-style `SELECT * FROM dex.trades` — one row per Swap log
-`(chain, tx_hash, log_index)`. Use search to filter by chain, protocol, or `is_clean`.
+`(chain, tx_hash, log_index)`. Dimensions: **chain × protocol × pool** (e.g. `USDC/WETH`).
 
 ```sql trades
 select *
@@ -63,6 +64,7 @@ from dex.trades
 <DataTable data={trades} rows=25 search=true>
   <Column id=chain />
   <Column id=protocol />
+  <Column id=pool title="Pool" />
   <Column id=block_number title="Block" />
   <Column id=tx_hash title="Tx" />
   <Column id=log_index title="Log #" />
@@ -77,6 +79,6 @@ from dex.trades
   <Column id=is_self_churn title="Self-churn" />
   <Column id=is_clean title="Clean" />
   <Column id=direction />
-  <Column id=pool_address title="Pool" />
+  <Column id=pool_address title="Pool address" />
   <Column id=fee_tier title="Fee" />
 </DataTable>

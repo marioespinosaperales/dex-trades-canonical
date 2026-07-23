@@ -96,6 +96,7 @@ select
     chain_id,
     protocol,
     pool_address,
+    token0_symbol || '/' || token1_symbol as pool,
     block_number,
     block_time,
     tx_hash,

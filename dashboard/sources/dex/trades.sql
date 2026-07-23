@@ -2,8 +2,10 @@ select
     chain,
     chain_id,
     protocol,
+    pool,
     pool_address,
-    block_number,
+    -- Exact block as text so Evidence does not compact to "49.0M"
+    cast(block_number as varchar) as block_number,
     tx_hash,
     log_index,
     trader,
@@ -22,4 +24,4 @@ select
     direction,
     fee_tier
 from mart_dex_trades
-order by chain, block_number desc, log_index desc
+order by chain, cast(block_number as bigint) desc, log_index desc

@@ -7,3 +7,11 @@ chains:
     chain_id: 8453
     rpc_env: DEX_BASE_RPC_URL
     confirmations: 12
+  - name: arbitrum
+    chain_id: 42161
+    rpc_env: DEX_ARB_RPC_URL
+    confirmations: 20
+  - name: avalanche
+    chain_id: 43114
+    rpc_env: DEX_AVAX_RPC_URL
+    confirmations: 12

@@ -80,6 +80,8 @@ class Secrets(BaseSettings):
 
     eth_rpc_url: str | None = None
     base_rpc_url: str | None = None
+    arb_rpc_url: str | None = None
+    avax_rpc_url: str | None = None
 
 
 class Settings(BaseModel):
@@ -125,10 +127,11 @@ def get_settings(config_dir: Path | None = None) -> Settings:
 def rpc_url_for_chain(chain: ChainConfig, settings: Settings | None = None) -> str:
     """Resolve RPC URL for a chain from DEX_ env vars (or the named rpc_env)."""
     settings = settings or get_settings()
-    # Prefer pydantic-settings fields for the two known chains.
     mapping = {
         "DEX_ETH_RPC_URL": settings.secrets.eth_rpc_url,
         "DEX_BASE_RPC_URL": settings.secrets.base_rpc_url,
+        "DEX_ARB_RPC_URL": settings.secrets.arb_rpc_url,
+        "DEX_AVAX_RPC_URL": settings.secrets.avax_rpc_url,
     }
     url = mapping.get(chain.rpc_env) or os.environ.get(chain.rpc_env)
     if not url:
