@@ -1,10 +1,11 @@
 # dex-trades-canonical
 
-**Raw fragmented DEX Swap events → canonical `dex.trades` → maintainable dbt SQL → noise filters → accountable methodology.**
+**Raw fragmented DEX Swap events → canonical `dex.trades` → maintainable dbt SQL →
+auditable quality labels → metric-impact scorecard.**
 
-Built for the Allium-shaped interview loop: semantic financial abstraction over Uniswap V2/V3 on
-**Ethereum, Base, Arbitrum, and Avalanche**, with dust and same-tx self-churn flags that stay in
-the table (filterable, not deleted).
+Semantic financial abstraction over Uniswap V2/V3 (and forks) on **Ethereum, Base,
+Arbitrum, and Avalanche**, with dust and same-tx self-churn flags that stay in the
+table (filterable, not deleted). Runnable locally with `uv` or in **Docker**.
 
 ```mermaid
 flowchart LR
@@ -14,8 +15,24 @@ flowchart LR
   duck --> stg["dbt stg_raw_swaps"]
   stg --> trades["dbt int_dex_trades"]
   trades --> marts["mart_dex_volume / mart_dex_trades"]
+  trades --> eval["QC scorecard"]
   marts --> evidence["Evidence snapshot"]
 ```
+
+## Research / QC framing
+
+This repo is the **labeling rubric** piece of the portfolio: design quality labels,
+keep them auditable, and measure whether they improve metric reliability.
+
+| Concern | How this repo answers it |
+|---|---|
+| Realistic task | Multi-chain Swap logs → one canonical trade grain |
+| Reliable rubric | Documented `is_dust` / `is_self_churn` rules, mirrored in Python + dbt |
+| Useful trajectories | Retained flags (not deleted rows) so analysts can audit filter impact |
+| Validation loop | Label distribution, clean-vs-total volume delta, dust-threshold sensitivity → scorecard |
+
+Also maps cleanly to Allium-style `dex.trades` interview expectations (see below).
+Sibling stories: [crypto-market-elt](https://github.com/marioespinosaperales/crypto-market-elt) (ingestion contracts) and [lp-history-reconstructor](https://github.com/marioespinosaperales/lp-history-reconstructor) (ground-truth eval).
 
 ## Allium gap mapping
 
@@ -23,8 +40,8 @@ flowchart LR
 |---|---|
 | Semantic gap | One grain: `(chain, tx_hash, log_index)` → sold/bought, human amounts, pool price |
 | Standardization | Same schema for V2 and V3 across Eth / Base / Arbitrum / Avalanche |
-| Infra / maintainability | Config YAML + pydantic, chunked RPC, Hive Parquet, dbt staging → marts |
-| Accountability | Documented dust + self-churn rules; flags retained for audit |
+| Infra / maintainability | Config YAML + pydantic, chunked RPC, Hive Parquet, dbt staging → marts, Docker |
+| Accountability | Documented dust + self-churn rules; flags retained for audit; QC scorecard |
 
 ## Scope (v1)
 
@@ -61,6 +78,9 @@ Same `tx_hash` has ≥2 swaps on the **same pool** for the **same trader** with 
 
 `not is_dust and not is_self_churn`. Volume marts expose both total and clean aggregates.
 
+The same rubric is executable in Python (`src/dex_trades/evals/labels.py`) for unit tests
+and the QC scorecard, so dbt and pytest cannot silently drift.
+
 ## Quickstart
 
 ```bash
@@ -70,8 +90,23 @@ cp .env.example .env   # set DEX_ETH_RPC_URL and DEX_BASE_RPC_URL
 make backfill          # index lookback (~5k blocks) per pool
 make transform         # DuckDB load + dbt build
 make snapshot          # Evidence DuckDB under dashboard/sources/dex/
+make eval              # QC scorecard → artifacts/qc_scorecard.md
 
 make lint && make test
+```
+
+Score the golden fixture without a warehouse / RPC:
+
+```bash
+uv run python -m dex_trades.evals --fixture-only
+```
+
+**Docker:**
+
+```bash
+make docker-build
+make docker-pipeline   # needs .env with Alchemy URLs
+make docker-test       # pytest + fixture scorecard inside the image
 ```
 
 Alchemy Free: `chunk_size: 10` (same `eth_getLogs` cap as sibling LP repo).
@@ -94,14 +129,16 @@ Alchemy Free: `chunk_size: 10` (same `eth_getLogs` cap as sibling LP repo).
 ```
 config/           chains, pools, pipeline (YAML; secrets via DEX_ env)
 src/dex_trades/   RPC, V2/V3 Swap decode, backfill, Parquet, DuckDB
+src/…/evals/      labeling rubric + QC scorecard (distribution, volume impact, threshold sweep)
 dbt/              stg → int_dex_trades → volume marts + tests
 dashboard/        Evidence over marts snapshot
-tests/            real-shaped Swap fixtures + noise unit tests
+tests/            real-shaped Swap fixtures + golden_trades.json + noise unit tests
+Dockerfile        reproducible Linux image (uv + pipeline)
 ```
 
 ## Portfolio
 
 Sibling projects:
 
-- [crypto-market-elt](https://github.com/marioespinosaperales/crypto-market-elt) — API ELT → dbt marts
-- [lp-history-reconstructor](https://github.com/marioespinosaperales/lp-history-reconstructor) — Uniswap LP event sourcing + fees/IL
+- [crypto-market-elt](https://github.com/marioespinosaperales/crypto-market-elt) — ingestion contracts + fail-fast QC
+- [lp-history-reconstructor](https://github.com/marioespinosaperales/lp-history-reconstructor) — LP event sourcing + ground-truth verify

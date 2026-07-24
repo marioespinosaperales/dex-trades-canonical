@@ -1,0 +1,62 @@
+[
+  {
+    "tx_hash": "0xclean1",
+    "pool_address": "0xpool",
+    "trader": "0xalice",
+    "direction": "0_to_1",
+    "amount_sold": 1000.0,
+    "amount_bought": 0.4,
+    "volume_quote_stable": 1000.0,
+    "quote_is_stable": true
+  },
+  {
+    "tx_hash": "0xdust1",
+    "pool_address": "0xpool",
+    "trader": "0xbob",
+    "direction": "0_to_1",
+    "amount_sold": 0.25,
+    "amount_bought": 0.0001,
+    "volume_quote_stable": 0.25,
+    "quote_is_stable": true
+  },
+  {
+    "tx_hash": "0xchurn1",
+    "pool_address": "0xpool",
+    "trader": "0xcarol",
+    "direction": "0_to_1",
+    "amount_sold": 50.0,
+    "amount_bought": 0.02,
+    "volume_quote_stable": 50.0,
+    "quote_is_stable": true
+  },
+  {
+    "tx_hash": "0xchurn1",
+    "pool_address": "0xpool",
+    "trader": "0xcarol",
+    "direction": "1_to_0",
+    "amount_sold": 0.02,
+    "amount_bought": 49.5,
+    "volume_quote_stable": 49.5,
+    "quote_is_stable": true
+  },
+  {
+    "tx_hash": "0xborder",
+    "pool_address": "0xpool",
+    "trader": "0xdave",
+    "direction": "0_to_1",
+    "amount_sold": 2.0,
+    "amount_bought": 0.001,
+    "volume_quote_stable": 2.0,
+    "quote_is_stable": true
+  },
+  {
+    "tx_hash": "0xmicro",
+    "pool_address": "0xpool",
+    "trader": "0xeve",
+    "direction": "1_to_0",
+    "amount_sold": 1e-9,
+    "amount_bought": 1e-9,
+    "volume_quote_stable": null,
+    "quote_is_stable": false
+  }
+]

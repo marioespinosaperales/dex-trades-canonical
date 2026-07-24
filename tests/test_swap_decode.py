@@ -109,45 +109,16 @@ def test_wrong_topic_returns_none():
     assert v3_swap.decode_swap(raw, **POOL_KW) is None
 
 
-def is_dust(
-    amount_sold: float,
-    amount_bought: float,
-    *,
-    volume_quote_stable: float | None,
-    quote_is_stable: bool,
-    dust_token: float = 1e-6,
-    dust_usdc: float = 1.0,
-) -> bool:
-    """Mirror dbt dust rule for unit coverage."""
-    if quote_is_stable and volume_quote_stable is not None and volume_quote_stable < dust_usdc:
-        return True
-    return amount_sold < dust_token and amount_bought < dust_token
-
-
-def is_self_churn(rows: list[dict]) -> list[bool]:
-    """Mirror dbt self-churn: same tx/pool/trader with reverse directions."""
-    from collections import defaultdict
-
-    groups: dict[tuple, list[dict]] = defaultdict(list)
-    for r in rows:
-        key = (r["tx_hash"], r["pool_address"], r["trader"])
-        groups[key].append(r)
-
-    flags = []
-    for r in rows:
-        key = (r["tx_hash"], r["pool_address"], r["trader"])
-        peers = groups[key]
-        dirs = {p["direction"] for p in peers if p["direction"] in ("0_to_1", "1_to_0")}
-        flags.append(len(peers) >= 2 and len(dirs) >= 2 and r["direction"] in dirs)
-    return flags
-
-
 def test_dust_usdc_threshold():
+    from dex_trades.evals.labels import is_dust
+
     assert is_dust(0.5, 0.0001, volume_quote_stable=0.5, quote_is_stable=True)
     assert not is_dust(100.0, 0.05, volume_quote_stable=100.0, quote_is_stable=True)
 
 
 def test_self_churn_flag():
+    from dex_trades.evals.labels import is_self_churn
+
     rows = [
         {
             "tx_hash": "0x1",
