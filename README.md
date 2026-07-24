@@ -30,6 +30,17 @@ keep them auditable, and measure whether they improve metric reliability.
 | Reliable rubric | Documented `is_dust` / `is_self_churn` rules, mirrored in Python + dbt |
 | Useful trajectories | Retained flags (not deleted rows) so analysts can audit filter impact |
 | Validation loop | Label distribution, clean-vs-total volume delta, dust-threshold sensitivity → scorecard |
+| ML signal | Rubric-vs-model: logistic regression on weak labels → `artifacts/ml_label_report.md` |
+
+### ML (rubric vs model)
+
+Train a noise classifier on weak labels from the auditable dust/self-churn rubric and
+measure holdout agreement (precision/recall/F1). The model **complements** the rubric;
+it does not replace retained quality flags in dbt.
+
+```bash
+make ml   # → artifacts/ml_label_report.md
+```
 
 Also maps cleanly to Allium-style `dex.trades` interview expectations (see below).
 Sibling stories: [crypto-market-elt](https://github.com/marioespinosaperales/crypto-market-elt) (ingestion contracts) and [lp-history-reconstructor](https://github.com/marioespinosaperales/lp-history-reconstructor) (ground-truth eval).
@@ -91,6 +102,7 @@ make backfill          # index lookback (~5k blocks) per pool
 make transform         # DuckDB load + dbt build
 make snapshot          # Evidence DuckDB under dashboard/sources/dex/
 make eval              # QC scorecard → artifacts/qc_scorecard.md
+make ml                # rubric-vs-model ML report → artifacts/ml_label_report.md
 
 make lint && make test
 ```
@@ -130,6 +142,7 @@ Alchemy Free: `chunk_size: 10` (same `eth_getLogs` cap as sibling LP repo).
 config/           chains, pools, pipeline (YAML; secrets via DEX_ env)
 src/dex_trades/   RPC, V2/V3 Swap decode, backfill, Parquet, DuckDB
 src/…/evals/      labeling rubric + QC scorecard (distribution, volume impact, threshold sweep)
+src/…/ml/         rubric-vs-model noise classifier + holdout metrics
 dbt/              stg → int_dex_trades → volume marts + tests
 dashboard/        Evidence over marts snapshot
 tests/            real-shaped Swap fixtures + golden_trades.json + noise unit tests
