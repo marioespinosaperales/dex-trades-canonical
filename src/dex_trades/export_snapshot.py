@@ -18,6 +18,7 @@ MARTS_SCHEMA = "main_marts"
 MART_TABLES = (
     "mart_dex_trades",
     "mart_dex_volume_by_protocol",
+    "mart_orderflow_signals",
 )
 
 

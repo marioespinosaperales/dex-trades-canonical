@@ -87,6 +87,13 @@ class RpcClient:
     def block_number(self) -> int:
         return int(self.call("eth_blockNumber"), 16)
 
+    def get_block(self, block_number: int, *, full_transactions: bool = False) -> dict[str, Any]:
+        """Return block object (includes post-merge ``feeRecipient`` when present)."""
+        result = self.call("eth_getBlockByNumber", [hex(block_number), full_transactions])
+        if not isinstance(result, dict):
+            raise RuntimeError(f"eth_getBlockByNumber returned non-object for {block_number}")
+        return result
+
     def get_logs(
         self,
         *,

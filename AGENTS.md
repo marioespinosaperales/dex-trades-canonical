@@ -35,6 +35,8 @@ Portfolio story: **labeling rubric + metric reliability** (sibling: crypto contr
 - `make snapshot` — export marts for Evidence
 - `make eval` — QC scorecard → `artifacts/qc_scorecard.md`
 - `make research` — orderflow research report → `artifacts/research_orderflow.md`
+- `make enrich-blocks` — PBS/builder `fee_recipient` for swap blocks
+- `make seed-dashboard` — Evidence DuckDB without RPC (orderflow page)
 - `make ml` — noise + orderflow ML reports
 - `make docker-pipeline` / `make docker-test`
 - `make lint && make test` — required before every commit

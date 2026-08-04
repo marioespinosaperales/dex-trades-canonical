@@ -142,42 +142,46 @@ flagged as (
 )
 
 select
-    chain,
-    chain_id,
-    protocol,
-    pool_address,
-    token0_symbol || '/' || token1_symbol as pool,
-    block_number,
-    block_time,
-    tx_hash,
-    log_index,
-    trader,
-    token_sold,
-    token_bought,
-    amount_sold,
-    amount_bought,
-    amount_sold_raw,
-    amount_bought_raw,
-    price_token1_per_token0,
-    volume_token0,
-    volume_quote_stable,
-    is_dust,
-    is_self_churn,
-    (not is_dust and not is_self_churn) as is_clean,
-    same_tx_swap_count,
-    is_multi_swap_tx,
-    same_block_pool_swap_count,
-    same_block_pool_tx_count,
-    is_same_block_pool_burst,
-    is_potential_sandwich_leg,
+    f.chain,
+    f.chain_id,
+    f.protocol,
+    f.pool_address,
+    f.token0_symbol || '/' || f.token1_symbol as pool,
+    f.block_number,
+    f.block_time,
+    f.tx_hash,
+    f.log_index,
+    f.trader,
+    f.token_sold,
+    f.token_bought,
+    f.amount_sold,
+    f.amount_bought,
+    f.amount_sold_raw,
+    f.amount_bought_raw,
+    f.price_token1_per_token0,
+    f.volume_token0,
+    f.volume_quote_stable,
+    f.is_dust,
+    f.is_self_churn,
+    (not f.is_dust and not f.is_self_churn) as is_clean,
+    f.same_tx_swap_count,
+    f.is_multi_swap_tx,
+    f.same_block_pool_swap_count,
+    f.same_block_pool_tx_count,
+    f.is_same_block_pool_burst,
+    f.is_potential_sandwich_leg,
     (
-        is_multi_swap_tx
-        or is_same_block_pool_burst
-        or is_potential_sandwich_leg
-        or is_self_churn
+        f.is_multi_swap_tx
+        or f.is_same_block_pool_burst
+        or f.is_potential_sandwich_leg
+        or f.is_self_churn
     ) as is_orderflow_interesting,
-    token0_symbol,
-    token1_symbol,
-    direction,
-    fee_tier
-from flagged
+    b.fee_recipient,
+    f.token0_symbol,
+    f.token1_symbol,
+    f.direction,
+    f.fee_tier
+from flagged f
+left join {{ ref('stg_raw_blocks') }} b
+    on f.chain = b.chain
+    and f.block_number = b.block_number

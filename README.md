@@ -36,14 +36,16 @@ keep them auditable, and measure whether they improve metric reliability.
 ### Market structure / MEV-lite
 
 Auditable proxies (not sandwich proof): multi-swap txs, same-block pool bursts, and
-A→B→A sandwich-leg heuristics. Flags stay on the row for filtering.
+A→B→A sandwich-leg heuristics. Optional PBS join: block `fee_recipient` via
+`make enrich-blocks`. Flags stay on the row for filtering.
 
 ```bash
-make research   # → artifacts/research_orderflow.md
+make research         # → artifacts/research_orderflow.md
+make seed-dashboard   # Evidence DuckDB without RPC (orderflow page)
 ```
 
-See [RESEARCH.md](RESEARCH.md) for hypothesis → evidence → product implications
-(including what you'd measure next for networking / inclusion delay).
+Evidence: `dashboard/pages/orderflow.md`. See [RESEARCH.md](RESEARCH.md) for
+hypothesis → evidence → product implications (inclusion delay / builder joins next).
 
 ### ML (rubric vs model)
 
@@ -111,8 +113,11 @@ uv sync
 cp .env.example .env   # set DEX_ETH_RPC_URL and DEX_BASE_RPC_URL
 
 make backfill          # index lookback (~5k blocks) per pool
+make enrich-blocks     # feeRecipient (PBS/builder proxy) for swap blocks
 make transform         # DuckDB load + dbt build
-make snapshot          # Evidence DuckDB under dashboard/sources/dex/
+make snapshot          # Evidence DuckDB from warehouse marts
+# or without RPC/warehouse:
+make seed-dashboard    # synthetic Evidence snapshot (orderflow page ready)
 make eval              # QC scorecard → artifacts/qc_scorecard.md
 make research          # orderflow / MEV-lite research report
 make ml                # noise + orderflow ML holdout reports

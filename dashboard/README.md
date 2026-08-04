@@ -5,12 +5,16 @@ Minimal Evidence site over the exported `dex_marts.duckdb` snapshot.
 ## Local (recommended for exploring)
 
 ```bash
-# from repo root, after make transform && make snapshot
+# from repo root — either warehouse export or offline seed:
+#   make transform && make snapshot
+#   make seed-dashboard
 cd dashboard
 npm install
 npm run sources
 npm run dev
 ```
+
+Pages: index (canonical trades) and **orderflow** (MEV-lite proxies + fee recipient).
 
 Do **not** open `dex_marts.duckdb` in DuckDB’s desktop UI via a Windows absolute path
 (`C:\...`). DuckDB parses `c:` as a catalog name and errors with

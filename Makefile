@@ -1,6 +1,6 @@
 # Requires make (on Windows: Git Bash, or `winget install GnuWin32.Make`).
 
-.PHONY: install lint test backfill warehouse transform snapshot pipeline eval research ml docker-build docker-pipeline docker-test
+.PHONY: install lint test backfill enrich-blocks warehouse transform snapshot seed-dashboard pipeline eval research ml docker-build docker-pipeline docker-test
 
 install:
 	uv sync
@@ -14,6 +14,9 @@ test:
 backfill:
 	uv run python -m dex_trades.run
 
+enrich-blocks:
+	uv run python -m dex_trades.index.enrich_blocks_cli
+
 warehouse:
 	uv run python -m dex_trades.build_warehouse
 
@@ -23,7 +26,10 @@ transform: warehouse
 snapshot:
 	uv run python -m dex_trades.export_snapshot
 
-pipeline: backfill transform snapshot
+seed-dashboard:
+	uv run python -m dex_trades.seed_dashboard_snapshot
+
+pipeline: backfill enrich-blocks transform snapshot
 
 eval:
 	uv run python -m dex_trades.evals

@@ -26,3 +26,5 @@ models:
         tests: [not_null]
       - name: is_potential_sandwich_leg
         tests: [not_null]
+      - name: fee_recipient
+        description: Block feeRecipient / miner (PBS builder proxy); null if blocks not enriched.

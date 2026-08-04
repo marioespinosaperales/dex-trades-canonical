@@ -78,16 +78,19 @@ def build_orderflow_report(
         ),
         "evidence": summary,
         "limitations": [
-            "No mempool, builder, relay, or timing data — proxies are not sandwich proof.",
+            "No mempool, relay bids, or timing data — proxies are not sandwich proof.",
+            "fee_recipient (when enriched) is a PBS/builder address proxy, not bundle proof.",
             "Routers and aggregators can produce multi-swap patterns without MEV.",
             "Fixture + synthetic augmentation is for methodology demo, not mainnet incidence.",
         ],
         "product_implications": [
             "Analytics layer: expose retained orderflow flags so customers can filter "
             "interesting vs clean volume separately.",
+            "PBS join: fee_recipient lets you ask whether interesting flow concentrates "
+            "under certain builders (see make enrich-blocks + Evidence orderflow page).",
             "Networking product angle: the next measurements that matter are inclusion delay "
             "and propagation asymmetry for contended pool/block flow — not just trade counts.",
-            "Next: join builder/relay metadata and mempool arrival vs on-chain inclusion.",
+            "Next: relay catalogs, mempool arrival vs on-chain inclusion, Xatu-style latency.",
         ],
     }
 
