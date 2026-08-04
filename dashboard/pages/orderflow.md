@@ -4,14 +4,28 @@ title: Orderflow / MEV-lite
 
 Hypothesis-driven **orderflow proxies** on canonical `dex.trades`.
 
-These flags are **auditable heuristics**, not sandwich proof. No mempool or relay
-timing is required for this view — see
+These flags are **auditable heuristics**, not sandwich proof. See
+[Benchmarks](/benchmarks) for the exact rates we calculate, and
 [RESEARCH.md](https://github.com/marioespinosaperales/dex-trades-canonical/blob/main/RESEARCH.md).
 
 ## Signal rates by chain × protocol
 
 ```sql signals
-select * from dex.orderflow_signals
+select
+    chain,
+    protocol,
+    trade_count,
+    interesting_trades,
+    sandwich_proxy_trades,
+    multi_swap_trades,
+    burst_trades,
+    clean_trades,
+    interesting_trade_rate,
+    interesting_volume_share,
+    interesting_volume_quote_stable,
+    clean_volume_quote_stable,
+    total_volume_quote_stable
+from dex.orderflow_signals
 ```
 
 ```sql signal_totals
@@ -19,8 +33,6 @@ select
     sum(trade_count) as trades,
     sum(interesting_trades) as interesting_trades,
     sum(sandwich_proxy_trades) as sandwich_proxy_trades,
-    sum(multi_swap_trades) as multi_swap_trades,
-    sum(burst_trades) as burst_trades,
     sum(interesting_volume_quote_stable) as interesting_volume,
     sum(clean_volume_quote_stable) as clean_volume,
     sum(total_volume_quote_stable) as total_volume
@@ -50,27 +62,32 @@ from dex.orderflow_signals
   data={signals}
   x=protocol
   y=interesting_trade_rate
-  series=chain
   title="Interesting trade rate by protocol"
   yFmt=pct
 />
 
-<BarChart
-  data={signals}
-  x=protocol
-  y=interesting_volume_quote_stable
-  series=chain
-  title="Interesting volume by protocol (stable)"
-  yFmt=usd
-/>
-
 ## Interesting trades (sample)
 
+Booleans cast to 0/1 for stable Evidence tables.
+
 ```sql interesting
-select * from dex.orderflow_trades
+select
+    chain,
+    protocol,
+    pool,
+    block_number,
+    tx_hash,
+    log_index,
+    volume_quote_stable,
+    case when is_multi_swap_tx then 1 else 0 end as multi_swap,
+    case when is_same_block_pool_burst then 1 else 0 end as burst,
+    case when is_potential_sandwich_leg then 1 else 0 end as sandwich_proxy,
+    fee_recipient,
+    direction
+from dex.orderflow_trades
 ```
 
-<DataTable data={interesting} rows=25 search=true>
+<DataTable data={interesting} rows=25>
   <Column id=chain />
   <Column id=protocol />
   <Column id=pool />
@@ -78,9 +95,9 @@ select * from dex.orderflow_trades
   <Column id=tx_hash title="Tx" />
   <Column id=log_index title="Log #" />
   <Column id=volume_quote_stable title="Vol (stable)" fmt=usd />
-  <Column id=is_multi_swap_tx title="Multi-swap" />
-  <Column id=is_same_block_pool_burst title="Burst" />
-  <Column id=is_potential_sandwich_leg title="Sandwich proxy" />
+  <Column id=multi_swap title="Multi-swap" />
+  <Column id=burst title="Burst" />
+  <Column id=sandwich_proxy title="Sandwich proxy" />
   <Column id=fee_recipient title="Fee recipient" />
   <Column id=direction />
 </DataTable>
@@ -92,5 +109,4 @@ select * from dex.orderflow_trades
 - **Sandwich proxy:** A→B→A direction pattern by log index in a block+pool
 - **Fee recipient:** block `feeRecipient` when enriched (PBS / builder proxy)
 
-Next measurements for a networking product: inclusion delay and propagation asymmetry
-for contended pool/block flow.
+Next measurements: inclusion delay and propagation asymmetry for contended pool/block flow.

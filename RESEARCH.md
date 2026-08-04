@@ -26,8 +26,11 @@ self-churn filters remove. Noise labels alone understate toxic or contended orde
 See latest `artifacts/research_orderflow.md` (generated). Golden fixture includes an
 explicit A→B→A sandwich-shaped triple so the heuristic is unit-tested.
 
-**Dashboard:** Evidence page `dashboard/pages/orderflow.md` (local `npm run dev` under
-`dashboard/`, or Vercel after connecting the repo). Seed without RPC:
+**Dashboard (live):**
+[Benchmarks](https://dex-trades-canonical.vercel.app/benchmarks) ·
+[Orderflow](https://dex-trades-canonical.vercel.app/orderflow)
+
+Local: `npm run dev` under `dashboard/`. Seed without RPC:
 
 ```bash
 make seed-dashboard   # → dashboard/sources/dex/dex_marts.duckdb

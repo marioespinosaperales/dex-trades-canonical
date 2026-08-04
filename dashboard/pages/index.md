@@ -9,8 +9,8 @@ Noise rows are **flagged, not deleted**. Filter on `is_clean` for volume (USDC-a
 
 Source: [dex-trades-canonical](https://github.com/marioespinosaperales/dex-trades-canonical).
 
-Orderflow / MEV-lite proxies (multi-swap, burst, sandwich-leg, `fee_recipient`): see the
-[Orderflow / MEV-lite](/orderflow) page.
+Interview links: [Benchmarks (what we measure)](/benchmarks) ·
+[Orderflow / MEV-lite](/orderflow).
 
 ## Volume by protocol
 

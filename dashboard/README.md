@@ -2,6 +2,10 @@
 
 Minimal Evidence site over the exported `dex_marts.duckdb` snapshot.
 
+**Live:** https://dex-trades-canonical.vercel.app/  
+Pages: [Benchmarks](https://dex-trades-canonical.vercel.app/benchmarks) ·
+[Orderflow](https://dex-trades-canonical.vercel.app/orderflow)
+
 ## Local (recommended for exploring)
 
 ```bash

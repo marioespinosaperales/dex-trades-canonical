@@ -3,6 +3,10 @@
 **Raw fragmented DEX Swap events → canonical `dex.trades` → maintainable dbt SQL →
 auditable quality labels → metric-impact scorecard.**
 
+**Live dashboard:** [dex-trades-canonical on Vercel](https://dex-trades-canonical.vercel.app/)
+· [Benchmarks](https://dex-trades-canonical.vercel.app/benchmarks) ·
+[Orderflow](https://dex-trades-canonical.vercel.app/orderflow)
+
 Semantic financial abstraction over Uniswap V2/V3 (and forks) on **Ethereum, Base,
 Arbitrum, and Avalanche**, with dust and same-tx self-churn flags that stay in the
 table (filterable, not deleted). Runnable locally with `uv` or in **Docker**.

@@ -2,7 +2,7 @@
 
     uv run python -m dex_trades.seed_dashboard_snapshot
 
-Writes dashboard/sources/dex/dex_marts.duckdb so the orderflow Vercel page has data.
+Writes dashboard/sources/dex/dex_marts.duckdb so Evidence / Vercel have data.
 """
 
 from __future__ import annotations
@@ -12,6 +12,7 @@ import logging
 import duckdb
 import pandas as pd
 
+from dex_trades.dashboard_benchmarks import benchmarks_from_trades
 from dex_trades.evals.labels import annotate_rows
 from dex_trades.export_snapshot import SNAPSHOT_PATH
 from dex_trades.ml.dataset import expand_synthetic_rows, load_trade_rows
@@ -40,7 +41,6 @@ def _build_trades_frame() -> pd.DataFrame:
         r.setdefault("direction", r.get("direction", "0_to_1"))
         r.setdefault("fee_tier", 3000)
         tx = str(r.get("tx_hash", ""))
-        # Synthetic PBS proxy: sandwich-shaped txs share a fee recipient
         if tx.startswith("0xsand") or "syn_s" in tx:
             r["fee_recipient"] = "0xbuilder_sandwich"
         else:
@@ -114,6 +114,11 @@ def seed_snapshot() -> dict[str, int]:
     trades = _build_trades_frame()
     orderflow = _orderflow_mart(trades)
     volume = _volume_mart(trades)
+    benches = benchmarks_from_trades(
+        trades,
+        source=str(FIXTURE),
+        source_kind="seed_synthetic",
+    )
 
     SNAPSHOT_PATH.parent.mkdir(parents=True, exist_ok=True)
     tmp = SNAPSHOT_PATH.with_suffix(".duckdb.tmp")
@@ -125,14 +130,19 @@ def seed_snapshot() -> dict[str, int]:
         conn.execute("CREATE TABLE mart_dex_trades AS SELECT * FROM trades_df")
         conn.execute("CREATE TABLE mart_orderflow_signals AS SELECT * FROM orderflow_df")
         conn.execute("CREATE TABLE mart_dex_volume_by_protocol AS SELECT * FROM volume_df")
+        for name, frame in benches.items():
+            conn.register(f"{name}_df", frame)
+            conn.execute(f"CREATE TABLE {name} AS SELECT * FROM {name}_df")
+
         def _count(table: str) -> int:
             return int(conn.execute(f"select count(*) from {table}").fetchone()[0])
 
-        counts = {
-            "mart_dex_trades": _count("mart_dex_trades"),
-            "mart_orderflow_signals": _count("mart_orderflow_signals"),
-            "mart_dex_volume_by_protocol": _count("mart_dex_volume_by_protocol"),
-        }
+        counts = {t: _count(t) for t in (
+            "mart_dex_trades",
+            "mart_orderflow_signals",
+            "mart_dex_volume_by_protocol",
+            *benches.keys(),
+        )}
     SNAPSHOT_PATH.unlink(missing_ok=True)
     tmp.rename(SNAPSHOT_PATH)
     return counts

@@ -23,3 +23,7 @@ def test_seed_snapshot_has_orderflow_and_fee_recipient(monkeypatch, tmp_path: Pa
             "select count(*) from mart_dex_trades where is_orderflow_interesting"
         ).fetchone()[0]
         assert n_interesting >= 1
+        kpi_n = conn.execute("select count(*) from mart_qc_kpis").fetchone()[0]
+        assert kpi_n >= 8
+        meta = conn.execute("select source_kind from mart_run_meta").fetchone()[0]
+        assert meta == "seed_synthetic"
