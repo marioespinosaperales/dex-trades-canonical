@@ -28,10 +28,11 @@ def test_golden_fixture_scorecard(tmp_path):
     rows = json.loads(FIXTURE.read_text(encoding="utf-8"))
     annotated = annotate_rows(rows, dust_usdc=1.0)
     dist = label_distribution(annotated)
-    assert dist["trades"] == 6
+    assert dist["trades"] == 9
     assert dist["dust"] >= 1
     assert dist["self_churn"] == 2
     assert dist["clean"] >= 1
+    assert dist["orderflow_interesting"] >= 3
 
     impact = volume_impact(annotated)
     assert impact["total_volume_quote_stable"] > impact["clean_volume_quote_stable"]

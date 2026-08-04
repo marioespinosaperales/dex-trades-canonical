@@ -12,3 +12,11 @@ models:
     columns:
       - name: trade_count
         tests: [not_null]
+
+  - name: mart_orderflow_signals
+    description: Orderflow / MEV-lite proxy rates by chain × protocol (not sandwich proof).
+    columns:
+      - name: trade_count
+        tests: [not_null]
+      - name: interesting_trade_rate
+        tests: [not_null]

@@ -1,6 +1,6 @@
 # Requires make (on Windows: Git Bash, or `winget install GnuWin32.Make`).
 
-.PHONY: install lint test backfill warehouse transform snapshot pipeline eval ml docker-build docker-pipeline docker-test
+.PHONY: install lint test backfill warehouse transform snapshot pipeline eval research ml docker-build docker-pipeline docker-test
 
 install:
 	uv sync
@@ -28,8 +28,12 @@ pipeline: backfill transform snapshot
 eval:
 	uv run python -m dex_trades.evals
 
+research:
+	uv run python -m dex_trades.research
+
 ml:
 	uv run python -m dex_trades.ml
+	uv run python -m dex_trades.ml --target orderflow
 
 docker-build:
 	docker compose build

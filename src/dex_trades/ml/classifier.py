@@ -28,10 +28,11 @@ def train_noise_classifier(
     *,
     seed: int = 42,
     test_size: float = 0.25,
+    label: str = "is_noisy",
 ) -> TrainedNoiseModel:
-    x, y = xy_from_frame(frame)
+    x, y = xy_from_frame(frame, label=label)
     if len(np.unique(y)) < 2:
-        raise ValueError("Need both clean and noisy labels to train")
+        raise ValueError(f"Need both classes for label={label}")
 
     x_train, x_test, y_train, y_test = train_test_split(
         x,
@@ -58,6 +59,7 @@ def train_noise_classifier(
     from dex_trades.ml.compare import classification_metrics
 
     metrics = classification_metrics(y_test, y_pred)
+    metrics["label"] = label
     metrics["n_train"] = int(len(y_train))
     metrics["n_test"] = int(len(y_test))
     metrics["feature_columns"] = list(FEATURE_COLUMNS)

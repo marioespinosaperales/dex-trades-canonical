@@ -75,11 +75,12 @@ def write_report(
     report: dict[str, Any],
     *,
     artifacts_dir: Path | None = None,
+    stem: str = "ml_label_report",
 ) -> Path:
     out_dir = artifacts_dir or (PROJECT_ROOT / "artifacts")
     out_dir.mkdir(parents=True, exist_ok=True)
-    md_path = out_dir / "ml_label_report.md"
-    json_path = out_dir / "ml_label_report.json"
+    md_path = out_dir / f"{stem}.md"
+    json_path = out_dir / f"{stem}.json"
     md_path.write_text(render_markdown(report), encoding="utf-8")
     json_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     return md_path

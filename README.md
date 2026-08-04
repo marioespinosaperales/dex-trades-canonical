@@ -30,16 +30,28 @@ keep them auditable, and measure whether they improve metric reliability.
 | Reliable rubric | Documented `is_dust` / `is_self_churn` rules, mirrored in Python + dbt |
 | Useful trajectories | Retained flags (not deleted rows) so analysts can audit filter impact |
 | Validation loop | Label distribution, clean-vs-total volume delta, dust-threshold sensitivity → scorecard |
-| ML signal | Rubric-vs-model: logistic regression on weak labels → `artifacts/ml_label_report.md` |
+| ML signal | Rubric-vs-model on noise + orderflow_interesting → `artifacts/ml_*.md` |
+| Market structure | MEV-lite proxies + hypothesis memo → [RESEARCH.md](RESEARCH.md) |
+
+### Market structure / MEV-lite
+
+Auditable proxies (not sandwich proof): multi-swap txs, same-block pool bursts, and
+A→B→A sandwich-leg heuristics. Flags stay on the row for filtering.
+
+```bash
+make research   # → artifacts/research_orderflow.md
+```
+
+See [RESEARCH.md](RESEARCH.md) for hypothesis → evidence → product implications
+(including what you'd measure next for networking / inclusion delay).
 
 ### ML (rubric vs model)
 
-Train a noise classifier on weak labels from the auditable dust/self-churn rubric and
-measure holdout agreement (precision/recall/F1). The model **complements** the rubric;
-it does not replace retained quality flags in dbt.
+Train classifiers on weak labels (noise and orderflow_interesting) and measure holdout
+agreement. Models **complement** the rubric; they do not replace retained flags.
 
 ```bash
-make ml   # → artifacts/ml_label_report.md
+make ml   # → artifacts/ml_label_report.md + ml_orderflow_report.md
 ```
 
 Also maps cleanly to Allium-style `dex.trades` interview expectations (see below).
@@ -102,7 +114,8 @@ make backfill          # index lookback (~5k blocks) per pool
 make transform         # DuckDB load + dbt build
 make snapshot          # Evidence DuckDB under dashboard/sources/dex/
 make eval              # QC scorecard → artifacts/qc_scorecard.md
-make ml                # rubric-vs-model ML report → artifacts/ml_label_report.md
+make research          # orderflow / MEV-lite research report
+make ml                # noise + orderflow ML holdout reports
 
 make lint && make test
 ```

@@ -22,3 +22,7 @@ models:
         tests: [not_null]
       - name: is_clean
         tests: [not_null]
+      - name: is_orderflow_interesting
+        tests: [not_null]
+      - name: is_potential_sandwich_leg
+        tests: [not_null]

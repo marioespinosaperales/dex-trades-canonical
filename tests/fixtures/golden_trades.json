@@ -7,7 +7,9 @@
     "amount_sold": 1000.0,
     "amount_bought": 0.4,
     "volume_quote_stable": 1000.0,
-    "quote_is_stable": true
+    "quote_is_stable": true,
+    "block_number": 100,
+    "log_index": 1
   },
   {
     "tx_hash": "0xdust1",
@@ -17,7 +19,9 @@
     "amount_sold": 0.25,
     "amount_bought": 0.0001,
     "volume_quote_stable": 0.25,
-    "quote_is_stable": true
+    "quote_is_stable": true,
+    "block_number": 101,
+    "log_index": 1
   },
   {
     "tx_hash": "0xchurn1",
@@ -27,7 +31,9 @@
     "amount_sold": 50.0,
     "amount_bought": 0.02,
     "volume_quote_stable": 50.0,
-    "quote_is_stable": true
+    "quote_is_stable": true,
+    "block_number": 102,
+    "log_index": 1
   },
   {
     "tx_hash": "0xchurn1",
@@ -37,7 +43,9 @@
     "amount_sold": 0.02,
     "amount_bought": 49.5,
     "volume_quote_stable": 49.5,
-    "quote_is_stable": true
+    "quote_is_stable": true,
+    "block_number": 102,
+    "log_index": 2
   },
   {
     "tx_hash": "0xborder",
@@ -47,7 +55,9 @@
     "amount_sold": 2.0,
     "amount_bought": 0.001,
     "volume_quote_stable": 2.0,
-    "quote_is_stable": true
+    "quote_is_stable": true,
+    "block_number": 103,
+    "log_index": 1
   },
   {
     "tx_hash": "0xmicro",
@@ -57,6 +67,44 @@
     "amount_sold": 1e-9,
     "amount_bought": 1e-9,
     "volume_quote_stable": null,
-    "quote_is_stable": false
+    "quote_is_stable": false,
+    "block_number": 104,
+    "log_index": 1
+  },
+  {
+    "tx_hash": "0xsand_a",
+    "pool_address": "0xpool",
+    "trader": "0xattacker",
+    "direction": "0_to_1",
+    "amount_sold": 200.0,
+    "amount_bought": 0.08,
+    "volume_quote_stable": 200.0,
+    "quote_is_stable": true,
+    "block_number": 200,
+    "log_index": 10
+  },
+  {
+    "tx_hash": "0xsand_v",
+    "pool_address": "0xpool",
+    "trader": "0xvictim",
+    "direction": "1_to_0",
+    "amount_sold": 0.05,
+    "amount_bought": 120.0,
+    "volume_quote_stable": 120.0,
+    "quote_is_stable": true,
+    "block_number": 200,
+    "log_index": 11
+  },
+  {
+    "tx_hash": "0xsand_b",
+    "pool_address": "0xpool",
+    "trader": "0xattacker",
+    "direction": "0_to_1",
+    "amount_sold": 180.0,
+    "amount_bought": 0.07,
+    "volume_quote_stable": 180.0,
+    "quote_is_stable": true,
+    "block_number": 200,
+    "log_index": 12
   }
 ]

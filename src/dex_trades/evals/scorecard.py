@@ -39,14 +39,19 @@ def label_distribution(rows: list[dict]) -> dict[str, Any]:
     dust = sum(1 for r in rows if r.get("is_dust"))
     churn = sum(1 for r in rows if r.get("is_self_churn"))
     clean = sum(1 for r in rows if r.get("is_clean"))
+    interesting = sum(1 for r in rows if r.get("is_orderflow_interesting"))
+    sandwich = sum(1 for r in rows if r.get("is_potential_sandwich_leg"))
     return {
         "trades": n,
         "dust": dust,
         "self_churn": churn,
         "clean": clean,
+        "orderflow_interesting": interesting,
+        "potential_sandwich_leg": sandwich,
         "dust_rate": round(dust / n, 4) if n else 0.0,
         "self_churn_rate": round(churn / n, 4) if n else 0.0,
         "clean_rate": round(clean / n, 4) if n else 0.0,
+        "interesting_rate": round(interesting / n, 4) if n else 0.0,
     }
 
 

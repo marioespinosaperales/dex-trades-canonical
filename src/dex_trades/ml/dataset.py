@@ -23,6 +23,9 @@ FEATURE_COLUMNS = [
     "dir_1_to_0",
     "peer_count",
     "has_reverse_peer",
+    "same_tx_swap_count",
+    "same_block_pool_swap_count",
+    "same_block_pool_tx_count",
 ]
 
 
@@ -37,8 +40,9 @@ def expand_synthetic_rows(base: list[dict], *, n_extra: int = 80, seed: int = 42
     """Augment a small golden set so train/test splits are meaningful offline."""
     rng = np.random.default_rng(seed)
     rows = [dict(r) for r in base]
+    block = 50_000
     for i in range(n_extra):
-        kind = int(rng.integers(0, 4))
+        kind = int(rng.integers(0, 5))
         if kind == 0:  # clean large trade
             vol = float(rng.uniform(20.0, 5000.0))
             rows.append(
@@ -51,6 +55,8 @@ def expand_synthetic_rows(base: list[dict], *, n_extra: int = 80, seed: int = 42
                     "amount_bought": vol / float(rng.uniform(2000.0, 4000.0)),
                     "volume_quote_stable": vol,
                     "quote_is_stable": True,
+                    "block_number": block + i,
+                    "log_index": 1,
                 }
             )
         elif kind == 1:  # dust by USDC
@@ -65,6 +71,8 @@ def expand_synthetic_rows(base: list[dict], *, n_extra: int = 80, seed: int = 42
                     "amount_bought": vol / 3000.0,
                     "volume_quote_stable": vol,
                     "quote_is_stable": True,
+                    "block_number": block + i,
+                    "log_index": 1,
                 }
             )
         elif kind == 2:  # micro dust by token threshold
@@ -78,12 +86,15 @@ def expand_synthetic_rows(base: list[dict], *, n_extra: int = 80, seed: int = 42
                     "amount_bought": float(rng.uniform(1e-12, 1e-7)),
                     "volume_quote_stable": None,
                     "quote_is_stable": False,
+                    "block_number": block + i,
+                    "log_index": 1,
                 }
             )
-        else:  # self-churn pair
+        elif kind == 3:  # self-churn pair
             vol = float(rng.uniform(10.0, 200.0))
             tx = f"0xsyn_churn_{i}"
             trader = f"0xtc_{i}"
+            b = block + i
             rows.append(
                 {
                     "tx_hash": tx,
@@ -94,6 +105,8 @@ def expand_synthetic_rows(base: list[dict], *, n_extra: int = 80, seed: int = 42
                     "amount_bought": vol / 3000.0,
                     "volume_quote_stable": vol,
                     "quote_is_stable": True,
+                    "block_number": b,
+                    "log_index": 1,
                 }
             )
             rows.append(
@@ -106,7 +119,52 @@ def expand_synthetic_rows(base: list[dict], *, n_extra: int = 80, seed: int = 42
                     "amount_bought": vol * 0.99,
                     "volume_quote_stable": vol * 0.99,
                     "quote_is_stable": True,
+                    "block_number": b,
+                    "log_index": 2,
                 }
+            )
+        else:  # sandwich-proxy triple in one block
+            b = block + 10_000 + i
+            vol = float(rng.uniform(50.0, 400.0))
+            rows.extend(
+                [
+                    {
+                        "tx_hash": f"0xsyn_sa_{i}",
+                        "pool_address": "0xpool",
+                        "trader": f"0xatt_{i}",
+                        "direction": "0_to_1",
+                        "amount_sold": vol,
+                        "amount_bought": vol / 2500.0,
+                        "volume_quote_stable": vol,
+                        "quote_is_stable": True,
+                        "block_number": b,
+                        "log_index": 10,
+                    },
+                    {
+                        "tx_hash": f"0xsyn_sv_{i}",
+                        "pool_address": "0xpool",
+                        "trader": f"0xvic_{i}",
+                        "direction": "1_to_0",
+                        "amount_sold": vol / 2500.0,
+                        "amount_bought": vol * 0.6,
+                        "volume_quote_stable": vol * 0.6,
+                        "quote_is_stable": True,
+                        "block_number": b,
+                        "log_index": 11,
+                    },
+                    {
+                        "tx_hash": f"0xsyn_sb_{i}",
+                        "pool_address": "0xpool",
+                        "trader": f"0xatt_{i}",
+                        "direction": "0_to_1",
+                        "amount_sold": vol * 0.9,
+                        "amount_bought": vol * 0.9 / 2500.0,
+                        "volume_quote_stable": vol * 0.9,
+                        "quote_is_stable": True,
+                        "block_number": b,
+                        "log_index": 12,
+                    },
+                ]
             )
     return rows
 
@@ -148,7 +206,11 @@ def build_feature_frame(rows: list[dict], *, dust_usdc: float = 1.0) -> pd.DataF
                 "dir_1_to_0": int(direction == "1_to_0"),
                 "peer_count": peer_count,
                 "has_reverse_peer": has_reverse,
+                "same_tx_swap_count": int(row.get("same_tx_swap_count", 1)),
+                "same_block_pool_swap_count": int(row.get("same_block_pool_swap_count", 1)),
+                "same_block_pool_tx_count": int(row.get("same_block_pool_tx_count", 1)),
                 "is_noisy": int(not bool(row["is_clean"])),
+                "is_orderflow_interesting": int(bool(row["is_orderflow_interesting"])),
                 "is_clean": int(bool(row["is_clean"])),
                 "is_dust": int(bool(row["is_dust"])),
                 "is_self_churn": int(bool(row["is_self_churn"])),
@@ -157,7 +219,11 @@ def build_feature_frame(rows: list[dict], *, dust_usdc: float = 1.0) -> pd.DataF
     return pd.DataFrame.from_records(records)
 
 
-def xy_from_frame(frame: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
+def xy_from_frame(
+    frame: pd.DataFrame,
+    *,
+    label: str = "is_noisy",
+) -> tuple[np.ndarray, np.ndarray]:
     x = frame[FEATURE_COLUMNS].to_numpy(dtype=float)
-    y = frame["is_noisy"].to_numpy(dtype=int)
+    y = frame[label].to_numpy(dtype=int)
     return x, y

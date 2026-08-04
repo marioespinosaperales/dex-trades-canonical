@@ -10,7 +10,9 @@ Portfolio story: **labeling rubric + metric reliability** (sibling: crypto contr
 - `src/dex_trades/index/` — V2 + V3 Swap decode, chunked multi-chain backfill
 - `src/dex_trades/load/` — Parquet Hive store + DuckDB raw loader + checkpoints
 - `src/dex_trades/evals/` — Python rubric (`labels.py`) + QC scorecard (distribution, volume impact, threshold sweep)
-- `src/dex_trades/ml/` — rubric-vs-model noise classifier + holdout metrics
+- `src/dex_trades/ml/` — rubric-vs-model noise + orderflow classifiers
+- `src/dex_trades/research/` — hypothesis-driven orderflow / MEV-lite reports
+- `RESEARCH.md` — atomic study writeup
 - `dbt/` — staging → `int_dex_trades` (canonical) → volume marts
 - `dashboard/` — Evidence over exported marts snapshot
 - `config/` — chains + pools + pipeline params; secrets ONLY via `DEX_` env vars
@@ -32,6 +34,7 @@ Portfolio story: **labeling rubric + metric reliability** (sibling: crypto contr
 - `make transform` — DuckDB load + `dbt build`
 - `make snapshot` — export marts for Evidence
 - `make eval` — QC scorecard → `artifacts/qc_scorecard.md`
-- `make ml` — rubric-vs-model report → `artifacts/ml_label_report.md`
+- `make research` — orderflow research report → `artifacts/research_orderflow.md`
+- `make ml` — noise + orderflow ML reports
 - `make docker-pipeline` / `make docker-test`
 - `make lint && make test` — required before every commit
