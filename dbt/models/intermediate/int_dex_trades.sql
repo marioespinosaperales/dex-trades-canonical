@@ -118,25 +118,29 @@ flagged as (
             and same_block_pool_tx_count >= 2
         ) as is_same_block_pool_burst,
         -- A→B→A by log_index in the same block+pool (proxy; marks all three legs).
-        (
+        -- coalesce: lag/lead NULLs make SQL three-valued logic yield NULL, not false.
+        coalesce(
             (
-                prev_direction in ('0_to_1', '1_to_0')
-                and next_direction = prev_direction
-                and direction in ('0_to_1', '1_to_0')
-                and direction <> prev_direction
-            )
-            or (
-                next_direction in ('0_to_1', '1_to_0')
-                and next2_direction = direction
-                and direction in ('0_to_1', '1_to_0')
-                and direction <> next_direction
-            )
-            or (
-                prev_direction in ('0_to_1', '1_to_0')
-                and prev2_direction = direction
-                and direction in ('0_to_1', '1_to_0')
-                and direction <> prev_direction
-            )
+                (
+                    prev_direction in ('0_to_1', '1_to_0')
+                    and next_direction = prev_direction
+                    and direction in ('0_to_1', '1_to_0')
+                    and direction <> prev_direction
+                )
+                or (
+                    next_direction in ('0_to_1', '1_to_0')
+                    and next2_direction = direction
+                    and direction in ('0_to_1', '1_to_0')
+                    and direction <> next_direction
+                )
+                or (
+                    prev_direction in ('0_to_1', '1_to_0')
+                    and prev2_direction = direction
+                    and direction in ('0_to_1', '1_to_0')
+                    and direction <> prev_direction
+                )
+            ),
+            false
         ) as is_potential_sandwich_leg
     from with_windows
 )
@@ -170,11 +174,12 @@ select
     f.same_block_pool_tx_count,
     f.is_same_block_pool_burst,
     f.is_potential_sandwich_leg,
-    (
+    coalesce(
         f.is_multi_swap_tx
         or f.is_same_block_pool_burst
         or f.is_potential_sandwich_leg
-        or f.is_self_churn
+        or f.is_self_churn,
+        false
     ) as is_orderflow_interesting,
     b.fee_recipient,
     f.token0_symbol,

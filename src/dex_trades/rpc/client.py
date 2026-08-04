@@ -16,6 +16,9 @@ logger = logging.getLogger(__name__)
 
 RETRYABLE_STATUS = {429, 500, 502, 503, 504}
 
+# httpx INFO logs full request URLs (includes Alchemy API keys). Keep it quiet.
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 
 class RpcClient:
     def __init__(

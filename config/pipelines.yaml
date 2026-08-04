@@ -3,7 +3,8 @@ data_dir: ./data
 checkpoint_dir: ./data/checkpoints
 duckdb_path: ./warehouse/dex.duckdb
 chunk_size: 10
-lookback_blocks: 5000
+# 1000 ≈ interview-sized live sample on Alchemy free (chunk_size 10). Raise for denser history.
+lookback_blocks: 1000
 confirmations: 12
 rpc_timeout_seconds: 30
 rpc_max_retries: 5
