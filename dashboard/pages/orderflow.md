@@ -2,13 +2,10 @@
 title: Orderflow / MEV-lite
 ---
 
-Hypothesis-driven **orderflow proxies** on canonical `dex.trades`.
+Structural orderflow proxies on canonical `dex.trades`, retained as filterable flags
+(not deletes). Rates and inference live on [Quality benchmarks](/benchmarks).
 
-These flags are **auditable heuristics**, not sandwich proof. See
-[Benchmarks](/benchmarks) for the exact rates we calculate, and
-[RESEARCH.md](https://github.com/marioespinosaperales/dex-trades-canonical/blob/main/RESEARCH.md).
-
-## Signal rates by chain × protocol
+## Rates by chain × protocol
 
 ```sql signals
 select
@@ -26,6 +23,7 @@ select
     clean_volume_quote_stable,
     total_volume_quote_stable
 from dex.orderflow_signals
+order by interesting_volume_quote_stable desc nulls last
 ```
 
 ```sql signal_totals
@@ -62,51 +60,65 @@ from dex.orderflow_signals
   data={signals}
   x=protocol
   y=interesting_trade_rate
-  title="Interesting trade rate by protocol"
+  series=chain
+  title="Interesting trade rate by protocol × chain"
   yFmt=pct
 />
 
-## Interesting trades (sample)
+## Flagged trades
 
-Booleans cast to 0/1 for stable Evidence tables.
+Rows with at least one orderflow proxy. Addresses and block numbers follow the
+configured pools; demo snapshots use deterministic hashes until a warehouse export.
 
 ```sql interesting
 select
     chain,
     protocol,
     pool,
-    block_number,
+    pool_address,
+    cast(block_number as varchar) as block_number,
     tx_hash,
     log_index,
+    trader,
     volume_quote_stable,
+    price_token1_per_token0,
+    fee_tier,
     case when is_multi_swap_tx then 1 else 0 end as multi_swap,
     case when is_same_block_pool_burst then 1 else 0 end as burst,
     case when is_potential_sandwich_leg then 1 else 0 end as sandwich_proxy,
     fee_recipient,
     direction
 from dex.orderflow_trades
+order by chain, cast(block_number as bigint) desc, log_index
 ```
 
-<DataTable data={interesting} rows=25>
+<DataTable data={interesting} rows=30>
   <Column id=chain />
   <Column id=protocol />
   <Column id=pool />
+  <Column id=pool_address title="Pool" />
   <Column id=block_number title="Block" />
   <Column id=tx_hash title="Tx" />
-  <Column id=log_index title="Log #" />
-  <Column id=volume_quote_stable title="Vol (stable)" fmt=usd />
-  <Column id=multi_swap title="Multi-swap" />
+  <Column id=log_index title="Log" />
+  <Column id=volume_quote_stable title="Vol $" fmt=usd />
+  <Column id=price_token1_per_token0 title="Price t1/t0" fmt=num6 />
+  <Column id=fee_tier title="Fee" />
+  <Column id=multi_swap title="Multi" />
   <Column id=burst title="Burst" />
-  <Column id=sandwich_proxy title="Sandwich proxy" />
-  <Column id=fee_recipient title="Fee recipient" />
+  <Column id=sandwich_proxy title="Sandwich" />
+  <Column id=fee_recipient title="feeRecipient" />
   <Column id=direction />
 </DataTable>
 
-## How to read this
+## Definitions
 
-- **Multi-swap:** ≥2 swaps in one tx (routers and MEV both show up)
-- **Burst:** ≥2 txs hitting the same pool in the same block
-- **Sandwich proxy:** A→B→A direction pattern by log index in a block+pool
-- **Fee recipient:** block `feeRecipient` when enriched (PBS / builder proxy)
+| Flag | Rule |
+|---|---|
+| Multi-swap | ≥2 swaps in one transaction |
+| Burst | ≥2 txs on the same pool in the same block |
+| Sandwich proxy | A→B→A direction pattern by `log_index` in block+pool |
+| feeRecipient | Block builder/proposer address when blocks are enriched |
 
-Next measurements: inclusion delay and propagation asymmetry for contended pool/block flow.
+These are auditable heuristics for volume hygiene and contention screens. They are
+not sandwich proof and do not use mempool or relay timing. Natural next metrics:
+inclusion delay and propagation asymmetry on contended pool/block flow.

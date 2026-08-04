@@ -15,7 +15,7 @@ select
     amount_bought,
     amount_sold_raw,
     amount_bought_raw,
-    price_token1_per_token0,
+    coalesce(price_token1_per_token0, 0) as price_token1_per_token0,
     volume_token0,
     volume_quote_stable,
     is_dust,

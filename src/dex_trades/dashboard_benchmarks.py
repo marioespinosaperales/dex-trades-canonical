@@ -8,6 +8,7 @@ from typing import Any
 import pandas as pd
 
 from dex_trades.evals.scorecard import build_scorecard_from_rows
+from dex_trades.stats_tests import build_stat_tests
 
 
 def benchmarks_from_trades(
@@ -16,9 +17,10 @@ def benchmarks_from_trades(
     source: str,
     source_kind: str,
 ) -> dict[str, pd.DataFrame]:
-    """Return DuckDB-ready frames: mart_qc_kpis, mart_dust_threshold_sweep, mart_run_meta."""
+    """Return DuckDB-ready QC + inference tables for Evidence."""
     rows: list[dict[str, Any]] = trades.to_dict(orient="records")
     scorecard = build_scorecard_from_rows(rows, source=source, already_labeled=True)
+    stat_tests = build_stat_tests(trades)
     dist = scorecard.label_distribution
     impact = scorecard.volume_impact
     n = int(dist["trades"])
@@ -126,9 +128,22 @@ def benchmarks_from_trades(
         ]
     )
 
+    notes = (
+        "Executable QC rubric (Python labels mirrored in dbt) plus rate CIs and "
+        "association tests. Orderflow flags are structural proxies, not sandwich proof. "
+    )
+    if source_kind.startswith("seed"):
+        notes += (
+            "Snapshot is a multi-pool demo seeded from config/pools.yaml "
+            "(replace with make backfill → transform → snapshot for live RPC data)."
+        )
+    else:
+        notes += "Snapshot exported from the DuckDB warehouse marts."
+
     return {
         "mart_qc_kpis": kpis,
         "mart_dust_threshold_sweep": pd.DataFrame(scorecard.threshold_sweep),
+        "mart_stat_tests": stat_tests,
         "mart_run_meta": pd.DataFrame(
             [
                 {
@@ -136,10 +151,7 @@ def benchmarks_from_trades(
                     "source": source,
                     "source_kind": source_kind,
                     "trade_count": n,
-                    "notes": (
-                        "Benchmarks from executable rubric (Python labels mirrored in dbt). "
-                        "Orderflow flags are proxies, not sandwich proof."
-                    ),
+                    "notes": notes,
                 }
             ]
         ),

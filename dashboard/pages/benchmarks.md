@@ -1,23 +1,25 @@
 ---
-title: Benchmarks (what we measure)
+title: Quality benchmarks
 ---
 
-Interview-facing **measurement card**: definitions, rates, and sensitivity.
-Same numbers the QC scorecard (`make eval`) and orderflow research report compute.
+Measurement card for canonical `dex.trades`: label rates, volume impact, threshold
+sensitivity, and lightweight inference (Wilson CIs, bootstrap, Mann–Whitney, χ²).
+
+Computed by the same rubric as `make eval` / `make research`.
 
 ```sql meta
-select generated_at, source_kind, trade_count, notes, source
+select generated_at, source_kind, trade_count, notes
 from dex.run_meta
 ```
 
 <DataTable data={meta}>
-  <Column id=source_kind title="Source kind" />
+  <Column id=source_kind title="Source" />
   <Column id=trade_count title="Trades" />
-  <Column id=generated_at title="Generated at" />
+  <Column id=generated_at title="Generated" />
   <Column id=notes title="Notes" />
 </DataTable>
 
-## Headline KPIs
+## Headline results
 
 ```sql kpis
 select metric, value, unit, definition
@@ -47,21 +49,15 @@ where unit = 'share'
 ```
 
 ```sql kpi_count
-select value as trades
-from dex.qc_kpis
-where metric = 'trades'
+select value as trades from dex.qc_kpis where metric = 'trades'
 ```
 
 ```sql kpi_clean
-select value as clean_rate
-from dex.qc_kpis
-where metric = 'clean_rate'
+select value as clean_rate from dex.qc_kpis where metric = 'clean_rate'
 ```
 
 ```sql kpi_interesting
-select value as interesting_rate
-from dex.qc_kpis
-where metric = 'interesting_rate'
+select value as interesting_rate from dex.qc_kpis where metric = 'interesting_rate'
 ```
 
 ```sql kpi_noise_vol
@@ -79,21 +75,52 @@ where metric = 'noise_share_of_volume'
   <Column id=metric title="Metric" />
   <Column id=value title="Value" fmt=num4 />
   <Column id=unit title="Unit" />
-  <Column id=definition title="Definition (what we calculate)" />
+  <Column id=definition title="Definition" />
 </DataTable>
 
 <BarChart
   data={kpi_rates}
   x=metric
   y=value
-  title="Rate benchmarks (shares)"
+  title="Rate benchmarks"
   yFmt=pct
 />
+
+## Inference
+
+Wilson intervals on rates, bootstrap CI on noise volume share, Mann–Whitney on
+stable volume (interesting vs other), and χ² of interesting × `fee_recipient`
+(builder proxy). p-values test stated nulls — they do not prove MEV.
+
+```sql tests
+select
+    test_name,
+    hypothesis,
+    statistic,
+    p_value,
+    estimate,
+    ci_low,
+    ci_high,
+    n,
+    interpretation
+from dex.stat_tests
+order by test_name
+```
+
+<DataTable data={tests}>
+  <Column id=test_name title="Test" />
+  <Column id=hypothesis title="Hypothesis / estimand" />
+  <Column id=statistic title="Stat" fmt=num4 />
+  <Column id=p_value title="p-value" fmt=num4 />
+  <Column id=estimate title="Estimate" fmt=num4 />
+  <Column id=ci_low title="CI low" fmt=num4 />
+  <Column id=ci_high title="CI high" fmt=num4 />
+  <Column id=interpretation title="Result" />
+</DataTable>
 
 ## Dust threshold sensitivity
 
 How the `$ dust_usdc` cut moves clean rate and noise share of volume.
-This is the QC **threshold sweep** from `make eval`.
 
 ```sql sweep
 select
@@ -130,11 +157,11 @@ order by dust_usdc_threshold
   <Column id=noise_share_of_volume title="Noise vol share" fmt=pct />
 </DataTable>
 
-## How to read this in an interview
+## Takeaways
 
-1. **Clean vs total volume** — dust + self-churn inflate headline volume; prefer `is_clean`
-2. **Interesting orderflow** — multi-swap / burst / sandwich-proxy are retained flags, not deletes
-3. **Threshold sweep** — shows the metric is sensitive to a documented knob (`dust_usdc`)
-4. **Not sandwich proof** — no mempool/relay timing; next measurement is inclusion delay
+1. Headline volume without `is_clean` mixes dust and self-churn into economic activity
+2. Orderflow proxies (multi-swap / burst / sandwich-leg) stay on the row so volume can be split
+3. Threshold sweep shows metric movement under a documented knob (`dust_usdc`)
+4. Builder/`fee_recipient` association is a PBS join surface — not inclusion-delay proof
 
-Related: [Orderflow page](/orderflow) · [RESEARCH.md](https://github.com/marioespinosaperales/dex-trades-canonical/blob/main/RESEARCH.md)
+[Orderflow](/orderflow) · [RESEARCH.md](https://github.com/marioespinosaperales/dex-trades-canonical/blob/main/RESEARCH.md)

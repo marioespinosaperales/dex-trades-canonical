@@ -9,8 +9,7 @@ Noise rows are **flagged, not deleted**. Filter on `is_clean` for volume (USDC-a
 
 Source: [dex-trades-canonical](https://github.com/marioespinosaperales/dex-trades-canonical).
 
-Interview links: [Benchmarks (what we measure)](/benchmarks) ·
-[Orderflow / MEV-lite](/orderflow).
+[Quality benchmarks](/benchmarks) · [Orderflow / MEV-lite](/orderflow)
 
 ## Volume by protocol
 

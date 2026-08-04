@@ -6,6 +6,9 @@ Minimal Evidence site over the exported `dex_marts.duckdb` snapshot.
 Pages: [Benchmarks](https://dex-trades-canonical.vercel.app/benchmarks) ·
 [Orderflow](https://dex-trades-canonical.vercel.app/orderflow)
 
+Demo snapshot (`source_kind=seed_demo`) covers all enabled pools in `config/pools.yaml`.
+Warehouse exports set `source_kind=warehouse` after a real backfill.
+
 ## Local (recommended for exploring)
 
 ```bash
