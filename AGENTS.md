@@ -18,6 +18,12 @@ Portfolio story: **labeling rubric + metric reliability** (sibling: crypto contr
 - `config/` — chains + pools + pipeline params; secrets ONLY via `DEX_` env vars
 - `Dockerfile` / `docker-compose.yml` — reproducible Linux pipeline + scorecard
 
+## Git commits
+
+- NEVER add `Co-authored-by: Cursor <cursoragent@cursor.com>`, `Made-with: Cursor`, or any Cursor/AI attribution trailer to commits or PRs.
+- Commit messages must be authored only as the human repo owner (no Cursor co-author lines).
+- Do not pass `--trailer` for Cursor attribution when committing.
+
 ## Rules
 
 - Python 3.12, type hints on public signatures, functions over classes.

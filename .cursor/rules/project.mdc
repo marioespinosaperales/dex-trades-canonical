@@ -9,3 +9,5 @@ alwaysApply: true
 - Canonical trade grain and noise flags (`is_dust`, `is_self_churn`, `is_clean`) live in dbt `int_dex_trades`.
 - English only in committed text.
 - Do not commit `data/`, `warehouse/`, or `.env`.
+- NEVER add `Co-authored-by: Cursor <cursoragent@cursor.com>`, `Made-with: Cursor`, or any Cursor attribution trailer to commits/PRs.
+- Do not use `--trailer` for Cursor co-authors.
