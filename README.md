@@ -7,9 +7,10 @@ auditable quality labels → metric-impact scorecard.**
 · [Benchmarks](https://dex-trades-canonical.vercel.app/benchmarks) ·
 [Orderflow](https://dex-trades-canonical.vercel.app/orderflow)
 
-The public snapshot is a **multi-pool demo** seeded from `config/pools.yaml`
-(Eth / Base / Arb / Avalanche × Uniswap + Camelot / Aerodrome / Pharaoh). Replace it
-with live RPC data via `make backfill && make enrich-blocks && make transform && make snapshot`.
+The public Evidence snapshot is a **live Alchemy warehouse export** (`source_kind=warehouse`)
+across Eth / Base / Arb / Avalanche × Uniswap + Camelot / Aerodrome / Pharaoh.
+Refresh locally with `make backfill && make enrich-blocks && make transform && make snapshot`
+(or `make seed-dashboard` for an offline multi-pool demo).
 
 Semantic financial abstraction over Uniswap V2/V3 (and forks) on **Ethereum, Base,
 Arbitrum, and Avalanche**, with dust and same-tx self-churn flags that stay in the
